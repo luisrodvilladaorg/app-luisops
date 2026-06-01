@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@kubernetes/client-node": "^1.4.0",
+    "axios": "^1.16.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "node-cache": "^5.1.2"
+  }
+}
