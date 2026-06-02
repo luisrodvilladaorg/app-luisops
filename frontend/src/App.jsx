@@ -1,11 +1,12 @@
 import Layout from './components/Layout';
 import ClusterOverview from './components/ClusterOverview';
 import GitOpsStatus from './components/GitOpsStatus';
+import CICDPipeline from './components/CICDPipeline';
 import useClusterData from './hooks/useClusterData';
 import useGitOpsData from './hooks/useGitOpsData';
+import useCICDData from './hooks/useCICDData';
 
 const PLACEHOLDER_SECTIONS = [
-  { id: 'cicd', title: 'CI/CD Pipeline' },
   { id: 'metrics', title: 'Observability' },
   { id: 'architecture', title: 'Arquitectura' },
   { id: 'repos', title: 'Repositorios' },
@@ -25,6 +26,7 @@ function SectionPlaceholder({ id, title }) {
 export default function App() {
   const cluster = useClusterData();
   const gitops = useGitOpsData();
+  const cicd = useCICDData();
 
   return (
     <Layout>
@@ -46,6 +48,16 @@ export default function App() {
           loading={gitops.loading}
           error={gitops.error}
           secondsAgo={gitops.secondsAgo}
+        />
+      </section>
+
+      <section id="cicd" className="mb-12 scroll-mt-20">
+        <h2 className="mb-6 text-2xl font-bold text-text-primary">CI/CD Pipeline</h2>
+        <CICDPipeline
+          runs={cicd.runs}
+          loading={cicd.loading}
+          error={cicd.error}
+          secondsAgo={cicd.secondsAgo}
         />
       </section>
 
