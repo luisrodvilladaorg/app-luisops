@@ -2,12 +2,13 @@ import Layout from './components/Layout';
 import ClusterOverview from './components/ClusterOverview';
 import GitOpsStatus from './components/GitOpsStatus';
 import CICDPipeline from './components/CICDPipeline';
+import Observability from './components/Observability';
 import useClusterData from './hooks/useClusterData';
 import useGitOpsData from './hooks/useGitOpsData';
 import useCICDData from './hooks/useCICDData';
+import useMetricsData from './hooks/useMetricsData';
 
 const PLACEHOLDER_SECTIONS = [
-  { id: 'metrics', title: 'Observability' },
   { id: 'architecture', title: 'Arquitectura' },
   { id: 'repos', title: 'Repositorios' },
 ];
@@ -27,6 +28,7 @@ export default function App() {
   const cluster = useClusterData();
   const gitops = useGitOpsData();
   const cicd = useCICDData();
+  const metrics = useMetricsData();
 
   return (
     <Layout>
@@ -58,6 +60,18 @@ export default function App() {
           loading={cicd.loading}
           error={cicd.error}
           secondsAgo={cicd.secondsAgo}
+        />
+      </section>
+
+      <section id="metrics" className="mb-12 scroll-mt-20">
+        <h2 className="mb-6 text-2xl font-bold text-text-primary">Observability</h2>
+        <Observability
+          red={metrics.red}
+          slo={metrics.slo}
+          history={metrics.history}
+          loading={metrics.loading}
+          error={metrics.error}
+          secondsAgo={metrics.secondsAgo}
         />
       </section>
 
