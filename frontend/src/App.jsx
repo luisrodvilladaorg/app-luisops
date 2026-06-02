@@ -3,26 +3,12 @@ import ClusterOverview from './components/ClusterOverview';
 import GitOpsStatus from './components/GitOpsStatus';
 import CICDPipeline from './components/CICDPipeline';
 import Observability from './components/Observability';
+import Architecture from './components/Architecture';
+import Repositories from './components/Repositories';
 import useClusterData from './hooks/useClusterData';
 import useGitOpsData from './hooks/useGitOpsData';
 import useCICDData from './hooks/useCICDData';
 import useMetricsData from './hooks/useMetricsData';
-
-const PLACEHOLDER_SECTIONS = [
-  { id: 'architecture', title: 'Arquitectura' },
-  { id: 'repos', title: 'Repositorios' },
-];
-
-function SectionPlaceholder({ id, title }) {
-  return (
-    <section id={id} className="mb-12 scroll-mt-20">
-      <h2 className="mb-6 text-2xl font-bold text-text-primary">{title}</h2>
-      <div className="rounded-lg border border-border bg-bg-card p-8 text-center text-text-secondary">
-        {title} — próximamente
-      </div>
-    </section>
-  );
-}
 
 export default function App() {
   const cluster = useClusterData();
@@ -75,9 +61,15 @@ export default function App() {
         />
       </section>
 
-      {PLACEHOLDER_SECTIONS.map(({ id, title }) => (
-        <SectionPlaceholder key={id} id={id} title={title} />
-      ))}
+      <section id="architecture" className="mb-12 scroll-mt-20">
+        <h2 className="mb-6 text-2xl font-bold text-text-primary">Arquitectura</h2>
+        <Architecture />
+      </section>
+
+      <section id="repos" className="mb-12 scroll-mt-20">
+        <h2 className="mb-6 text-2xl font-bold text-text-primary">Repositorios</h2>
+        <Repositories />
+      </section>
     </Layout>
   );
 }

@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const NAV_ITEMS = [
   { id: 'cluster', label: 'Cluster' },
   { id: 'gitops', label: 'GitOps' },
@@ -8,8 +10,11 @@ const NAV_ITEMS = [
 ];
 
 export default function Header() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const handleClick = (e, id) => {
     e.preventDefault();
+    setMobileOpen(false);
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
@@ -21,6 +26,7 @@ export default function Header() {
           luisops<span className="text-status-blue">.com</span>
         </a>
 
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
           {NAV_ITEMS.map(({ id, label }) => (
             <a
@@ -39,8 +45,35 @@ export default function Header() {
             <span className="h-2 w-2 rounded-full bg-status-green animate-pulse" />
             Live
           </span>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden flex flex-col items-center justify-center w-9 h-9 rounded-md hover:bg-bg-hover transition-colors"
+            aria-label="Toggle navigation"
+          >
+            <span className={`block h-0.5 w-5 bg-text-secondary transition-all duration-200 ${mobileOpen ? 'translate-y-1.5 rotate-45' : ''}`} />
+            <span className={`block h-0.5 w-5 bg-text-secondary mt-1 transition-all duration-200 ${mobileOpen ? 'opacity-0' : ''}`} />
+            <span className={`block h-0.5 w-5 bg-text-secondary mt-1 transition-all duration-200 ${mobileOpen ? '-translate-y-1.5 -rotate-45' : ''}`} />
+          </button>
         </div>
       </div>
+
+      {/* Mobile nav dropdown */}
+      {mobileOpen && (
+        <nav className="md:hidden border-t border-border bg-bg-primary/95 backdrop-blur-md px-6 py-3">
+          {NAV_ITEMS.map(({ id, label }) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              onClick={(e) => handleClick(e, id)}
+              className="block rounded-md px-3 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors"
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+      )}
     </header>
   );
 }

@@ -1,14 +1,41 @@
 import ClusterSummary from './ClusterSummary';
 import NodeCard from './NodeCard';
+import Skeleton from '../shared/Skeleton';
+import EmptyState from '../shared/EmptyState';
+
+function ClusterSkeleton() {
+  return (
+    <div>
+      <div className="mb-4 rounded-lg border border-border bg-bg-card px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-6 w-6 rounded-full" />
+            <Skeleton className="h-5 w-40" />
+          </div>
+          <Skeleton className="h-4 w-28" />
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="rounded-lg border border-border bg-bg-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <Skeleton className="h-5 w-32" />
+              <Skeleton className="h-5 w-16 rounded-full" />
+            </div>
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function ClusterOverview({ nodes, health, loading, error, secondsAgo }) {
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center rounded-lg border border-border bg-bg-card p-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-status-blue" />
-      </div>
-    );
-  }
+  if (loading) return <ClusterSkeleton />;
 
   if (error) {
     return (
@@ -16,6 +43,10 @@ export default function ClusterOverview({ nodes, health, loading, error, seconds
         Error loading cluster data: {error}
       </div>
     );
+  }
+
+  if (!nodes || nodes.length === 0) {
+    return <EmptyState icon="🖥️" message="No se encontraron nodos en el cluster" />;
   }
 
   return (

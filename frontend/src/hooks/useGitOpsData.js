@@ -35,9 +35,14 @@ export default function useGitOpsData() {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    const initialFetch = setTimeout(() => {
+      fetchData();
+    }, 0);
     const interval = setInterval(fetchData, POLL_INTERVAL);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialFetch);
+      clearInterval(interval);
+    };
   }, [fetchData]);
 
   useEffect(() => {
