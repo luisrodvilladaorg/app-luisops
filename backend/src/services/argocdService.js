@@ -2,14 +2,17 @@ const fs = require('fs');
 const https = require('https');
 const axios = require('axios');
 
-// Lee el certificado de la CA interna (wellness-ca) para que Node confíe
-// en argocd.wellness.local sin desactivar la verificacion TLS.
-const caCert = fs.readFileSync(process.env.ARGOCD_CA_CERT_PATH);
+const caCertPath = process.env.ARGOCD_CA_CERT_PATH;
+let httpsAgent = new https.Agent();
 
-// Agent HTTPS que usa nuestra CA interna como fuente de confianza.
-const httpsAgent = new https.Agent({
-  ca: caCert,
-});
+// Si el certificado interno existe, se usa como CA de confianza.
+// Si no existe, no se bloquea el arranque del backend.
+if (caCertPath && fs.existsSync(caCertPath)) {
+  const caCert = fs.readFileSync(caCertPath);
+  httpsAgent = new https.Agent({ ca: caCert });
+} else {
+  console.warn('ARGOCD_CA_CERT_PATH not found, using default trust store');
+}
 
 // Cliente axios preconfigurado: baseURL + token + agent en cada llamada.
 const argocdClient = axios.create({
