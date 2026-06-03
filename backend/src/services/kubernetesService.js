@@ -9,7 +9,6 @@ if (process.env.KUBERNETES_SERVICE_HOST) {
 }
 
 const coreApi = kc.makeApiClient(k8s.CoreV1Api);
-const appsApi = kc.makeApiClient(k8s.AppsV1Api);
 const metricsApi = kc.makeApiClient(k8s.CustomObjectsApi);
 
 async function getNodes() {

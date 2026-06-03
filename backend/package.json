@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "lint": "eslint ."
+  },
   "dependencies": {
     "@kubernetes/client-node": "^1.4.0",
     "axios": "^1.16.1",
@@ -6,5 +9,10 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "node-cache": "^5.1.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.3.0",
+    "globals": "^17.6.0"
   }
 }
