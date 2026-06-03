@@ -258,6 +258,38 @@ Observability:
 El foco actual del proyecto está en consolidar una operación unificada de plataforma:
 
 - Integrar health de infraestructura, despliegue y observabilidad en un solo panel.
+
+## CI/CD GitHub Actions
+
+Workflow definido en [ci-cd.yaml](.github/workflows/ci-cd.yaml):
+
+- Job lint: ejecuta ESLint en frontend y backend.
+- Job build-frontend: construye y publica imagen en GHCR.
+- Job build-backend: construye y publica imagen en GHCR.
+- Todos los jobs usan `runs-on: arc-runner-set`.
+
+### Secrets recomendados
+
+Configurar en GitHub: Settings > Secrets and variables > Actions > New repository secret
+
+- Nombre: `GHCR_TOKEN`
+- Valor: PAT con permisos mínimos:
+	- `write:packages`
+	- `read:packages`
+
+Si el repositorio es privado y necesitas leer código con ese token, agrega también `repo`.
+
+Nota: el workflow usa `GHCR_TOKEN` si existe y, como fallback, `GITHUB_TOKEN` con `packages: write`.
+
+### Verificación esperada
+
+Al hacer push a `main`, el workflow debe:
+
+1. Completar lint en verde.
+2. Construir y publicar:
+	 - `ghcr.io/<org>/app-luisops-frontend:latest`
+	 - `ghcr.io/<org>/app-luisops-backend:latest`
+3. Publicar también tags por commit SHA.
 - Operar un entorno multi-componente con GitOps y CI/CD reales.
 - Usar métricas operativas para validar estabilidad del entorno kubeadm.
 
