@@ -6,6 +6,7 @@ resources:
   - serviceaccount.yaml
   - clusterrole.yaml
   - clusterrolebinding.yaml
+  - networkpolicy-frontend.yaml
   - deployment-backend.yaml
   - deployment-frontend.yaml
   - service-backend.yaml

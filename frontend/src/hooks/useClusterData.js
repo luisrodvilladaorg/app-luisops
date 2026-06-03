@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3100';
+const API_BASE = import.meta.env.VITE_API_URL || '';
 const POLL_INTERVAL = 30000;
 
 export default function useClusterData() {
