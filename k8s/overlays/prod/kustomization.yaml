@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - sealedsecret-backend-tokens.yaml
+
+images:
+  - name: ghcr.io/luisrodvilladaorg/app-luisops-backend
+    newTag: REPLACE_WITH_BACKEND_TAG
+  - name: ghcr.io/luisrodvilladaorg/app-luisops-frontend
+    newTag: REPLACE_WITH_FRONTEND_TAG
