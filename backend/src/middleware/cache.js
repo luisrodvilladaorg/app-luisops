@@ -20,7 +20,10 @@ const cacheMiddleware = (duration) => {
 
     res.originalJson = res.json;
     res.json = (body) => {
-      store.set(key, body);
+      // Cache only successful responses to avoid serving stale upstream errors.
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        store.set(key, body);
+      }
       res.originalJson(body);
     };
 
