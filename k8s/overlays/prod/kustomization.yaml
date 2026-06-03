@@ -7,6 +7,6 @@ resources:
 
 images:
   - name: ghcr.io/luisrodvilladaorg/app-luisops-backend
-    newTag: 8ad2a3323002aa6138aa5258205c4c161c6b801c
+    newTag: e47b5796196928465a47435a32e4644ea66ab3c1
   - name: ghcr.io/luisrodvilladaorg/app-luisops-frontend
-    newTag: 8ad2a3323002aa6138aa5258205c4c161c6b801c
+    newTag: e47b5796196928465a47435a32e4644ea66ab3c1
