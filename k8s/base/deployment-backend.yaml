@@ -19,6 +19,8 @@ spec:
         app.kubernetes.io/part-of: luisops-dashboard
     spec:
       serviceAccountName: dashboard-reader
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: backend
           image: ghcr.io/luisrodvilladaorg/app-luisops-backend:latest
