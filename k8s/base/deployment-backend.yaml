@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: luisops-backend
+  namespace: dashboard
+  labels:
+    app.kubernetes.io/name: luisops-backend
+    app.kubernetes.io/part-of: luisops-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: luisops-backend
+  template:
+    metadata:
+      labels:
+        app: luisops-backend
+        app.kubernetes.io/name: luisops-backend
+        app.kubernetes.io/part-of: luisops-dashboard
+    spec:
+      serviceAccountName: dashboard-reader
+      containers:
+        - name: backend
+          image: ghcr.io/luisrodvilladaorg/app-luisops-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3100
+          env:
+            - name: PORT
+              value: "3100"
+            - name: CORS_ORIGIN
+              value: "*"
+            - name: PROMETHEUS_URL
+              value: http://kube-prom-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+            - name: ARGOCD_API_URL
+              value: https://argocd.wellness.local/api/v1
+            - name: ARGOCD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: ARGOCD_TOKEN
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: GITHUB_TOKEN
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

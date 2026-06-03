@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: luisops-frontend
+  namespace: dashboard
+  labels:
+    app.kubernetes.io/name: luisops-frontend
+    app.kubernetes.io/part-of: luisops-dashboard
+spec:
+  type: ClusterIP
+  selector:
+    app: luisops-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
