@@ -24,9 +24,9 @@ function ObservabilitySkeleton() {
 }
 
 export default function Observability({ red, slo, history, loading, error, secondsAgo }) {
-  if (loading) return <ObservabilitySkeleton />;
+  if (loading && !red && !slo) return <ObservabilitySkeleton />;
 
-  if (error) {
+  if (error && !red && !slo) {
     return (
       <div className="rounded-lg border border-status-red/30 bg-status-red/10 p-6 text-center text-status-red">
         Error loading metrics: {error}
@@ -35,7 +35,7 @@ export default function Observability({ red, slo, history, loading, error, secon
   }
 
   if (!red && !slo) {
-    return <EmptyState icon="📊" message="No hay métricas disponibles en este momento" />;
+    return <EmptyState icon="📊" message="No metrics available at this time" />;
   }
 
   return (
@@ -45,7 +45,7 @@ export default function Observability({ red, slo, history, loading, error, secon
           RED metrics + SLO compliance — last 24h
         </p>
         <span className="text-xs text-text-secondary">
-          Actualizado hace {secondsAgo}s
+          Updated {secondsAgo}s ago
         </span>
       </div>
 
@@ -79,7 +79,7 @@ export default function Observability({ red, slo, history, loading, error, secon
       </div>
 
       <p className="mt-4 text-xs text-text-secondary">
-        6 Grafana dashboards versionados en Git &middot; Prometheus + Loki stack
+        6 Grafana dashboards versioned in Git &middot; Prometheus + Loki stack
       </p>
     </div>
   );

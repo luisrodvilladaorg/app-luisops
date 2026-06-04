@@ -35,9 +35,9 @@ function ClusterSkeleton() {
 }
 
 export default function ClusterOverview({ nodes, health, loading, error, secondsAgo }) {
-  if (loading) return <ClusterSkeleton />;
+  if (loading && (!nodes || nodes.length === 0)) return <ClusterSkeleton />;
 
-  if (error) {
+  if (error && (!nodes || nodes.length === 0)) {
     return (
       <div className="rounded-lg border border-status-red/30 bg-status-red/10 p-6 text-center text-status-red">
         Error loading cluster data: {error}
@@ -46,7 +46,7 @@ export default function ClusterOverview({ nodes, health, loading, error, seconds
   }
 
   if (!nodes || nodes.length === 0) {
-    return <EmptyState icon="🖥️" message="No se encontraron nodos en el cluster" />;
+    return <EmptyState icon="🖥️" message="No nodes found in the cluster" />;
   }
 
   return (

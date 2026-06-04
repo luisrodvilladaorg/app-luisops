@@ -1,15 +1,15 @@
 const REPOS = [
   {
+    name: 'app-luisops',
+    url: 'https://github.com/luisrodvilladaorg/app-luisops',
+    description: 'Source code for this live dashboard, including backend APIs, frontend UI, and Kubernetes manifests.',
+    tags: ['React', 'Node.js', 'Kubernetes', 'ArgoCD', 'Observability'],
+  },
+  {
     name: 'wellness-ops',
     url: 'https://github.com/luisrodvilladaorg/wellness-ops',
     description: 'Full-stack Node.js/PostgreSQL app with GitOps, multi-environment CI/CD, and full observability stack',
     tags: ['Kubernetes', 'ArgoCD', 'GitHub Actions', 'Prometheus', 'Grafana', 'Loki', 'Velero'],
-  },
-  {
-    name: 'k8s-labs',
-    url: 'https://github.com/luisrodvilladaorg/k8s-labs',
-    description: 'Hands-on Kubernetes labs — NetworkPolicy, Taints & Tolerations, Ingress, NodeAffinity, RBAC',
-    tags: ['Kubernetes', 'YAML', 'kubeadm', 'Labs'],
   },
   {
     name: 'terraform-aws-production-stack',
@@ -18,10 +18,10 @@ const REPOS = [
     tags: ['Terraform', 'AWS', 'IaC', 'GitHub Actions', 'ARC Runner'],
   },
   {
-    name: 'app-luisops',
-    url: 'https://github.com/luisrodvilladaorg/app-luisops',
-    description: 'Source code for this live dashboard, including backend APIs, frontend UI, and Kubernetes manifests.',
-    tags: ['React', 'Node.js', 'Kubernetes', 'ArgoCD', 'Observability'],
+    name: 'k8s-labs',
+    url: 'https://github.com/luisrodvilladaorg/k8s-labs',
+    description: 'Hands-on Kubernetes labs — NetworkPolicy, Taints & Tolerations, Ingress, NodeAffinity, RBAC',
+    tags: ['Kubernetes', 'YAML', 'kubeadm', 'Labs'],
   },
 ];
 

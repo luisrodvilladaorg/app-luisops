@@ -5,6 +5,14 @@ import EmptyState from '../shared/EmptyState';
 
 const ENV_OPTIONS = ['all', 'dev', 'staging', 'prod', 'infra'];
 
+function extractEnvironment(name) {
+  if (name.endsWith('-dev')) return 'dev';
+  if (name.endsWith('-staging')) return 'staging';
+  if (name.endsWith('-prod')) return 'prod';
+  if (name.endsWith('-monitoring')) return 'monitoring';
+  return 'infra';
+}
+
 function GitOpsSkeleton() {
   return (
     <div>
@@ -48,15 +56,12 @@ export default function GitOpsStatus({ applications, loading, error, secondsAgo 
 
   const filteredApplications = useMemo(() => {
     if (selectedEnv === 'all') return appList;
-    return appList.filter((app) => {
-      const environment = (app.environment || '').toLowerCase();
-      return environment === selectedEnv;
-    });
+    return appList.filter((app) => extractEnvironment(app.name) === selectedEnv);
   }, [appList, selectedEnv]);
 
-  if (loading) return <GitOpsSkeleton />;
+  if (loading && appList.length === 0) return <GitOpsSkeleton />;
 
-  if (error) {
+  if (error && appList.length === 0) {
     return (
       <div className="rounded-lg border border-status-red/30 bg-status-red/10 p-6 text-center text-status-red">
         Error loading GitOps data: {error}
@@ -65,7 +70,7 @@ export default function GitOpsStatus({ applications, loading, error, secondsAgo 
   }
 
   if (appList.length === 0) {
-    return <EmptyState icon="🔄" message="No se encontraron aplicaciones en ArgoCD" />;
+    return <EmptyState icon="🔄" message="No applications found in ArgoCD" />;
   }
 
   const syncedCount = filteredApplications.filter((a) => a.syncStatus === 'Synced').length;
@@ -79,10 +84,10 @@ export default function GitOpsStatus({ applications, loading, error, secondsAgo 
             <span className="text-2xl font-bold text-status-green">{syncedCount}</span>
             <span className="text-2xl font-bold text-text-secondary">/</span>
             <span className="text-2xl font-bold text-text-primary">{totalCount}</span>
-            <span className="text-sm text-text-secondary">apps sincronizadas</span>
+            <span className="text-sm text-text-secondary">synced apps</span>
           </div>
           <span className="text-xs text-text-secondary">
-            Mostrando {totalCount} de {appList.length}
+            Showing {totalCount} of {appList.length}
           </span>
           <div className="flex flex-wrap items-center gap-2">
             {ENV_OPTIONS.map((env) => {
@@ -101,13 +106,13 @@ export default function GitOpsStatus({ applications, loading, error, secondsAgo 
           </div>
         </div>
         <span className="text-xs text-text-secondary">
-          Actualizado hace {secondsAgo}s
+          Updated {secondsAgo}s ago
         </span>
       </div>
 
       {filteredApplications.length === 0 && (
         <div className="mb-4">
-          <EmptyState icon="🧭" message={`No hay aplicaciones en environment ${selectedEnv}`} />
+          <EmptyState icon="🧭" message={`No apps in environment: ${selectedEnv}`} />
         </div>
       )}
 
@@ -138,7 +143,7 @@ export default function GitOpsStatus({ applications, loading, error, secondsAgo 
           <div key={app.name} className="rounded-lg border border-border bg-bg-card p-4 space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-medium text-text-primary text-sm">{app.name}</span>
-              <span className="text-xs text-text-secondary">{app.environment || '—'}</span>
+              <span className="text-xs text-text-secondary">{extractEnvironment(app.name)}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${app.syncStatus === 'Synced' ? 'bg-status-green/15 text-status-green' : 'bg-status-yellow/15 text-status-yellow'}`}>

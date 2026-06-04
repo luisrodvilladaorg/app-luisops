@@ -44,7 +44,7 @@ export default function ClusterSummary({ health, secondsAgo }) {
         ))}
       </div>
       <span className="text-xs text-text-secondary">
-        Actualizado hace {secondsAgo}s
+        Updated {secondsAgo}s ago
       </span>
     </div>
   );

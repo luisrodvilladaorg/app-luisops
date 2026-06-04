@@ -5,8 +5,9 @@ const NAV_ITEMS = [
   { id: 'gitops', label: 'GitOps' },
   { id: 'cicd', label: 'CI/CD' },
   { id: 'metrics', label: 'Metrics' },
-  { id: 'architecture', label: 'Arquitectura' },
+  { id: 'architecture', label: 'Architecture' },
   { id: 'repos', label: 'Repos' },
+  { id: 'author', label: 'Author' },
 ];
 
 export default function Header() {

@@ -38,9 +38,9 @@ function CICDSkeleton() {
 }
 
 export default function CICDPipeline({ runs, loading, error, secondsAgo }) {
-  if (loading) return <CICDSkeleton />;
+  if (loading && (!runs || runs.length === 0)) return <CICDSkeleton />;
 
-  if (error) {
+  if (error && (!runs || runs.length === 0)) {
     return (
       <div className="rounded-lg border border-status-red/30 bg-status-red/10 p-6 text-center text-status-red">
         Error loading CI/CD data: {error}
@@ -49,7 +49,7 @@ export default function CICDPipeline({ runs, loading, error, secondsAgo }) {
   }
 
   if (!runs || runs.length === 0) {
-    return <EmptyState icon="⚙️" message="No se encontraron ejecuciones de pipeline recientes" />;
+    return <EmptyState icon="⚙️" message="No recent pipeline runs found" />;
   }
 
   const successCount = runs.filter((r) => r.conclusion === 'success').length;
@@ -62,7 +62,7 @@ export default function CICDPipeline({ runs, loading, error, secondsAgo }) {
             <span className="text-2xl font-bold text-status-green">{successCount}</span>
             <span className="text-2xl font-bold text-text-secondary">/</span>
             <span className="text-2xl font-bold text-text-primary">{runs.length}</span>
-            <span className="text-sm text-text-secondary">runs exitosos</span>
+            <span className="text-sm text-text-secondary">successful runs</span>
           </div>
           <div className="group relative">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-status-blue/40 bg-status-blue/20 px-3 py-1 text-xs font-semibold text-status-blue shadow-sm">
@@ -75,7 +75,7 @@ export default function CICDPipeline({ runs, loading, error, secondsAgo }) {
           </div>
         </div>
         <span className="text-xs text-text-secondary">
-          Actualizado hace {secondsAgo}s
+          Updated {secondsAgo}s ago
         </span>
       </div>
 
@@ -96,7 +96,7 @@ export default function CICDPipeline({ runs, loading, error, secondsAgo }) {
           rel="noopener noreferrer"
           className="text-xs text-status-blue hover:underline"
         >
-          Ver todos los runs en GitHub &rarr;
+          View all runs on GitHub &rarr;
         </a>
       </div>
     </div>

@@ -17,7 +17,7 @@ export default function Footer() {
             GitHub
           </a>
           <a
-            href="https://www.linkedin.com/in/luis-fernando-rodriguez-villada"
+            href="https://www.linkedin.com/in/luis-fernando-rodriguez-villada/"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
