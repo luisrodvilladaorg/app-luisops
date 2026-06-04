@@ -1,6 +1,9 @@
+import { useMemo, useState } from 'react';
 import AppRow from './AppRow';
 import Skeleton from '../shared/Skeleton';
 import EmptyState from '../shared/EmptyState';
+
+const ENV_OPTIONS = ['all', 'dev', 'staging', 'prod', 'infra'];
 
 function GitOpsSkeleton() {
   return (
@@ -40,6 +43,17 @@ function GitOpsSkeleton() {
 }
 
 export default function GitOpsStatus({ applications, loading, error, secondsAgo }) {
+  const [selectedEnv, setSelectedEnv] = useState('all');
+  const appList = applications || [];
+
+  const filteredApplications = useMemo(() => {
+    if (selectedEnv === 'all') return appList;
+    return appList.filter((app) => {
+      const environment = (app.environment || '').toLowerCase();
+      return environment === selectedEnv;
+    });
+  }, [appList, selectedEnv]);
+
   if (loading) return <GitOpsSkeleton />;
 
   if (error) {
@@ -50,29 +64,55 @@ export default function GitOpsStatus({ applications, loading, error, secondsAgo 
     );
   }
 
-  if (!applications || applications.length === 0) {
+  if (appList.length === 0) {
     return <EmptyState icon="🔄" message="No se encontraron aplicaciones en ArgoCD" />;
   }
 
-  const syncedCount = applications.filter((a) => a.syncStatus === 'Synced').length;
-  const totalCount = applications.length;
+  const syncedCount = filteredApplications.filter((a) => a.syncStatus === 'Synced').length;
+  const totalCount = filteredApplications.length;
 
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-bg-card px-6 py-4">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-status-green">{syncedCount}</span>
-          <span className="text-2xl font-bold text-text-secondary">/</span>
-          <span className="text-2xl font-bold text-text-primary">{totalCount}</span>
-          <span className="text-sm text-text-secondary">apps sincronizadas</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-bold text-status-green">{syncedCount}</span>
+            <span className="text-2xl font-bold text-text-secondary">/</span>
+            <span className="text-2xl font-bold text-text-primary">{totalCount}</span>
+            <span className="text-sm text-text-secondary">apps sincronizadas</span>
+          </div>
+          <span className="text-xs text-text-secondary">
+            Mostrando {totalCount} de {appList.length}
+          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            {ENV_OPTIONS.map((env) => {
+              const isActive = selectedEnv === env;
+              return (
+                <button
+                  key={env}
+                  type="button"
+                  onClick={() => setSelectedEnv(env)}
+                  className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${isActive ? 'border-status-blue bg-status-blue/15 text-status-blue' : 'border-border text-text-secondary hover:border-status-blue/40 hover:text-text-primary'}`}
+                >
+                  {env === 'all' ? 'all' : env}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <span className="text-xs text-text-secondary">
           Actualizado hace {secondsAgo}s
         </span>
       </div>
 
+      {filteredApplications.length === 0 && (
+        <div className="mb-4">
+          <EmptyState icon="🧭" message={`No hay aplicaciones en environment ${selectedEnv}`} />
+        </div>
+      )}
+
       {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto rounded-lg border border-border bg-bg-card">
+      <div className="hidden overflow-x-auto rounded-lg border border-border bg-bg-card md:block">
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">
@@ -85,7 +125,7 @@ export default function GitOpsStatus({ applications, loading, error, secondsAgo 
             </tr>
           </thead>
           <tbody>
-            {applications.map((app) => (
+            {filteredApplications.map((app) => (
               <AppRow key={app.name} app={app} />
             ))}
           </tbody>
@@ -94,7 +134,7 @@ export default function GitOpsStatus({ applications, loading, error, secondsAgo 
 
       {/* Mobile card list */}
       <div className="md:hidden space-y-3">
-        {applications.map((app) => (
+        {filteredApplications.map((app) => (
           <div key={app.name} className="rounded-lg border border-border bg-bg-card p-4 space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-medium text-text-primary text-sm">{app.name}</span>

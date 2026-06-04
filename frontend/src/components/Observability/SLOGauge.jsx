@@ -34,6 +34,9 @@ export default function SLOGauge({ target, current, met }) {
             {met ? '\u2713 SLO met' : '\u2717 SLO breached'}
           </span>
         </div>
+        <p className={`mt-3 text-xs font-semibold ${met ? 'text-status-green' : 'text-status-red'}`}>
+          SLO Compliance {current}% · Target {target}% · {met ? '\u2713 SLO met' : '\u2717 SLO breached'}
+        </p>
       </div>
     </div>
   );

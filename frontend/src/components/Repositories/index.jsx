@@ -17,6 +17,12 @@ const REPOS = [
     description: 'Production-grade AWS infrastructure as code — VPC, ALB, ASG, RDS, S3, IAM, CloudWatch',
     tags: ['Terraform', 'AWS', 'IaC', 'GitHub Actions', 'ARC Runner'],
   },
+  {
+    name: 'app-luisops',
+    url: 'https://github.com/luisrodvilladaorg/app-luisops',
+    description: 'Source code for this live dashboard, including backend APIs, frontend UI, and Kubernetes manifests.',
+    tags: ['React', 'Node.js', 'Kubernetes', 'ArgoCD', 'Observability'],
+  },
 ];
 
 function RepoCard({ repo }) {
@@ -56,7 +62,7 @@ function RepoCard({ repo }) {
 
 export default function Repositories() {
   return (
-    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
       {REPOS.map((repo) => (
         <RepoCard key={repo.name} repo={repo} />
       ))}

@@ -1,11 +1,18 @@
 export default function ClusterSummary({ health, secondsAgo }) {
   if (!health) return null;
 
+  const podsRatio = health.podsTotal > 0 ? (health.podsRunning / health.podsTotal) * 100 : 0;
+  const podsColor = podsRatio > 90
+    ? 'text-status-green'
+    : podsRatio >= 80
+      ? 'text-status-yellow'
+      : 'text-status-red';
+
   const stats = [
     {
       label: 'Pods Running',
       value: `${health.podsRunning}/${health.podsTotal}`,
-      color: health.podsRunning === health.podsTotal ? 'text-status-green' : 'text-status-yellow',
+      color: podsColor,
     },
     {
       label: 'Namespaces',

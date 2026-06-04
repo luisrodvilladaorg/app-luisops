@@ -15,9 +15,31 @@ export default function App() {
   const gitops = useGitOpsData();
   const cicd = useCICDData();
   const metrics = useMetricsData();
+  const refreshCandidates = [cluster.secondsAgo, gitops.secondsAgo, cicd.secondsAgo, metrics.secondsAgo]
+    .filter((value) => Number.isFinite(value));
+  const lastRefreshSeconds = refreshCandidates.length > 0 ? Math.min(...refreshCandidates) : 0;
+  const clusterConnected = !cluster.loading && !cluster.error;
 
   return (
     <Layout>
+      <section className="mb-12 rounded-2xl border border-border bg-bg-card px-6 py-8 sm:px-8 sm:py-10">
+        <h1 className="text-4xl font-extrabold tracking-tight text-text-primary sm:text-5xl lg:text-6xl">
+          Live Kubernetes Cluster Monitor
+        </h1>
+        <p className="mt-4 max-w-4xl text-sm leading-relaxed text-text-secondary sm:text-base">
+          Real-time data from a 3-node kubeadm cluster running on bare-metal Proxmox · Not a demo — this is production infrastructure
+        </p>
+        <div className="mt-5 flex flex-wrap items-center gap-3 text-xs font-medium sm:text-sm">
+          <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 ${clusterConnected ? 'bg-status-green/15 text-status-green' : 'bg-status-yellow/15 text-status-yellow'}`}>
+            <span className={`h-2 w-2 rounded-full ${clusterConnected ? 'bg-status-green animate-pulse' : 'bg-status-yellow'}`} />
+            {clusterConnected ? 'Connected to cluster' : 'Connecting to cluster...'}
+          </span>
+          <span className="inline-flex items-center rounded-full bg-bg-hover px-3 py-1.5 text-text-secondary">
+            Last refresh: {lastRefreshSeconds}s ago
+          </span>
+        </div>
+      </section>
+
       <section id="cluster" className="mb-12 scroll-mt-20">
         <h2 className="mb-6 text-2xl font-bold text-text-primary">Cluster Overview</h2>
         <ClusterOverview

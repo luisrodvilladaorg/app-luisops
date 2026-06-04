@@ -64,15 +64,24 @@ export default function CICDPipeline({ runs, loading, error, secondsAgo }) {
             <span className="text-2xl font-bold text-text-primary">{runs.length}</span>
             <span className="text-sm text-text-secondary">runs exitosos</span>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-status-blue/15 px-3 py-1 text-xs font-medium text-status-blue">
-            <svg className="h-3 w-3" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.75A2.75 2.75 0 0 1 4.75 0h6.5A2.75 2.75 0 0 1 14 2.75v10.5A2.75 2.75 0 0 1 11.25 16h-6.5A2.75 2.75 0 0 1 2 13.25Zm6 1a.75.75 0 0 0-.75.75v4a.75.75 0 0 0 1.5 0v-4A.75.75 0 0 0 8 3.75ZM8 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></svg>
-            Self-hosted runner (arc-runner-set)
-          </span>
+          <div className="group relative">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-status-blue/40 bg-status-blue/20 px-3 py-1 text-xs font-semibold text-status-blue shadow-sm">
+              <svg className="h-3 w-3" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.75A2.75 2.75 0 0 1 4.75 0h6.5A2.75 2.75 0 0 1 14 2.75v10.5A2.75 2.75 0 0 1 11.25 16h-6.5A2.75 2.75 0 0 1 2 13.25Zm6 1a.75.75 0 0 0-.75.75v4a.75.75 0 0 0 1.5 0v-4A.75.75 0 0 0 8 3.75ZM8 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></svg>
+              Self-hosted runner (arc-runner-set)
+            </span>
+            <div className="pointer-events-none absolute left-0 top-full z-10 mt-2 w-64 rounded-md border border-border bg-bg-primary px-3 py-2 text-xs text-text-secondary opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+              Runs on self-hosted ARC runner inside the cluster.
+            </div>
+          </div>
         </div>
         <span className="text-xs text-text-secondary">
           Actualizado hace {secondsAgo}s
         </span>
       </div>
+
+      <p className="mb-4 text-xs font-medium text-status-blue">
+        Runs on self-hosted ARC runner inside the cluster.
+      </p>
 
       <div className="overflow-hidden rounded-lg border border-border bg-bg-card">
         {runs.map((run, i) => (

@@ -1,10 +1,10 @@
-import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
+import { AreaChart, Area, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 
 const COLOR_MAP = {
-  blue: { stroke: '#58a6ff', fill: '#58a6ff' },
-  red: { stroke: '#f85149', fill: '#f85149' },
-  yellow: { stroke: '#d29922', fill: '#d29922' },
-  green: { stroke: '#3fb950', fill: '#3fb950' },
+  blue: { stroke: '#1f6feb', fill: '#58a6ff' },
+  red: { stroke: '#cf222e', fill: '#f85149' },
+  yellow: { stroke: '#bf8700', fill: '#d29922' },
+  green: { stroke: '#2da44e', fill: '#3fb950' },
 };
 
 function formatTooltipTime(timestamp) {
@@ -44,20 +44,22 @@ export default function MetricCard({ title, value, unit, data, color = 'blue' })
             <AreaChart data={data} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id={`gradient-${color}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={colors.fill} stopOpacity={0.3} />
-                  <stop offset="100%" stopColor={colors.fill} stopOpacity={0.05} />
+                  <stop offset="0%" stopColor={colors.fill} stopOpacity={0.55} />
+                  <stop offset="100%" stopColor={colors.fill} stopOpacity={0.12} />
                 </linearGradient>
               </defs>
               <XAxis dataKey="timestamp" hide />
+              <CartesianGrid stroke="rgba(148, 163, 184, 0.2)" vertical={false} />
               <Tooltip content={<CustomTooltip />} />
               <Area
                 type="monotone"
                 dataKey="value"
                 stroke={colors.stroke}
-                strokeWidth={2}
+                strokeWidth={2.5}
                 fill={`url(#gradient-${color})`}
                 dot={false}
                 animationDuration={500}
+                style={{ filter: `drop-shadow(0 0 4px ${colors.stroke})` }}
               />
             </AreaChart>
           </ResponsiveContainer>
