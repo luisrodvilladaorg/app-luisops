@@ -1,322 +1,229 @@
 # app-luisops
 
-Dashboard operativo para observabilidad de un cluster Kubernetes montado con kubeadm.
+app-luisops is an operations dashboard for a real Kubernetes platform. It brings together cluster health, GitOps state from ArgoCD, CI/CD activity from GitHub Actions, and observability metrics from Prometheus in a single interface.
 
-Este proyecto muestra el estado real de la plataforma luisops: salud del cluster, estado GitOps con ArgoCD, actividad CI/CD en GitHub Actions y métricas RED/SLO desde Prometheus.
+The goal is not to display pretty cards. The goal is to give both an executive and technical view of the platform: what is healthy, what is degraded, and where to look first when something breaks.
 
-## Objetivo del proyecto
+## What it solves
 
-app-luisops no es solo una web informativa; es una consola ligera de operación para:
+- Reduces diagnosis time by centralizing cluster, GitOps, CI/CD, and metrics in one panel.
+- Lets you verify in seconds whether an application is synced, healthy, or out of sync.
+- Surfaces reliability signals with near real-time RED and SLO metrics.
+- Works well as a portfolio piece for recruiters: infrastructure, backend, frontend, GitOps, and operational thinking in one project.
 
-- Ver el estado de nodos y consumo CPU/RAM por nodo.
-- Validar sincronización y health de aplicaciones desplegadas por ArgoCD.
-- Seguir los últimos runs de pipelines CI/CD.
-- Consultar métricas de performance y fiabilidad (RED + SLO).
-- Mostrar la arquitectura end-to-end del entorno (infra, flujo de despliegue y observabilidad).
+## Real screenshots
 
-## Estado actual
+The images below were captured from the application while it was running with live platform data.
 
-Actualmente la aplicación está enfocada en monitorizar un entorno kubeadm con separación por dominios:
+### Overview
 
-- Cluster health (nodes/pods/namespaces/uptime).
-- GitOps health (sync + health status por aplicación).
-- CI/CD visibility (últimos 10 runs desde GitHub Actions).
-- Observabilidad funcional (Prometheus query + series temporales + gauge SLO).
+![Dashboard hero](docs/assets/hero-desktop.png)
 
-El backend ya incorpora caché por endpoint para reducir carga y mejorar latencia de respuesta.
+### GitOps
 
-## Arquitectura de alto nivel
+![GitOps state](docs/assets/gitops-desktop.png)
 
-Flujo funcional principal:
+### Observability
 
-1. Frontend React consulta el backend REST.
-2. Backend agrega datos desde Kubernetes API, ArgoCD API, GitHub API y Prometheus.
-3. Frontend renderiza paneles de estado con refresco periódico.
+![Observability section](docs/assets/observability-desktop.png)
 
-Diagrama conceptual:
+### Repositories
+
+![Repository block](docs/assets/repos-desktop.png)
+
+### Author
+
+![Author section](docs/assets/author-desktop.png)
+
+## Current system state
+
+The project is designed around a real Kubernetes environment, not mock data. In the current live capture you can see:
+
+- 3 Ready nodes.
+- 19 visible namespaces.
+- GitOps with 19/20 applications synced.
+- One application intentionally marked OutOfSync to reflect real operational state.
+- Observability showing live values and series, plus fallback handling when Prometheus is not reachable locally.
+
+The backend also includes request timeouts, per-endpoint caching, and partial responses when an upstream dependency fails, so the UI does not collapse into empty screens or total errors.
+
+## Architecture
 
 ```mermaid
 flowchart LR
-	UI[Frontend React + Vite] --> API[Backend Express]
+    UI[Frontend React + Vite] --> API[Backend Express]
 
-	API --> K8s[Kubernetes API]
-	API --> Argo[ArgoCD API]
-	API --> GH[GitHub Actions API]
-	API --> Prom[Prometheus API]
+    API --> K8s[Kubernetes API]
+    API --> Argo[ArgoCD API]
+    API --> GH[GitHub Actions API]
+    API --> Prom[Prometheus API]
 
-	K8s --> UI
-	Argo --> UI
-	GH --> UI
-	Prom --> UI
+    K8s --> UI
+    Argo --> UI
+    GH --> UI
+    Prom --> UI
 ```
 
-## Estructura del repositorio
+The flow is straightforward:
 
-- backend: API agregadora de datos operativos.
-- frontend: dashboard React.
-- k8s/base: RBAC y namespace base para despliegue en cluster.
+1. The frontend queries the REST backend.
+2. The backend aggregates data from Kubernetes, ArgoCD, GitHub, and Prometheus.
+3. The frontend renders module-level status with periodic refreshes.
 
-## Backend
+## Technical stack
 
-Stack:
+### Backend
 
 - Node.js + Express 5.
-- @kubernetes/client-node.
-- axios.
-- node-cache.
+- `@kubernetes/client-node` for cluster data.
+- `axios` for external APIs.
+- `node-cache` for lower latency and reduced load.
 
-### Endpoints disponibles
-
-Health:
-
-- GET /api/health
-
-Cluster:
-
-- GET /api/cluster/nodes
-- GET /api/cluster/pods
-- GET /api/cluster/namespaces
-- GET /api/cluster/health
-
-GitOps:
-
-- GET /api/gitops/applications
-
-CI/CD:
-
-- GET /api/cicd/runs
-
-Métricas:
-
-- GET /api/metrics/red
-- GET /api/metrics/slo
-- GET /api/metrics/history?hours=24&step=15m
-
-### Política de caché (NodeCache)
-
-TTL por tipo:
-
-- short: 30s
-- medium: 120s
-- long: 300s
-- extraLong: 900s
-
-Aplicación por rutas:
-
-- cluster/*: short
-- gitops/applications: short
-- cicd/runs: medium
-- metrics/red y metrics/slo: long
-- metrics/history: extraLong
-
-### Servicios integrados
-
-Kubernetes:
-
-- Obtiene nodos, pods, namespaces y health global.
-- Lee métricas de nodes desde metrics.k8s.io cuando están disponibles.
-- Funciona in-cluster y también en local usando kubeconfig por defecto.
-
-ArgoCD:
-
-- Consume la API de ArgoCD con token Bearer.
-- Usa CA interna para verificación TLS (sin desactivar seguridad).
-
-GitHub Actions:
-
-- Consume la API pública de runs del repo wellness-ops.
-- Devuelve los últimos 10 runs con estado, duración, rama y trigger.
-
-Prometheus:
-
-- Ejecuta instant queries para RED + SLO.
-- Ejecuta range queries para histórico de últimas horas.
-
-## Frontend
-
-Stack:
+### Frontend
 
 - React 19 + Vite.
 - Tailwind CSS v4.
-- Recharts para gráficas temporales.
+- Recharts for time-series visualizations.
 
-Secciones del dashboard:
+### Platform
+
+- Docker Compose for local execution.
+- Kubernetes for deployment.
+- ArgoCD for GitOps.
+- GitHub Actions for CI/CD.
+- Prometheus for observability.
+
+## Dashboard sections
 
 1. Cluster Overview
 2. GitOps Status
 3. CI/CD Pipeline
 4. Observability
-5. Arquitectura
-6. Repositorios
+5. Architecture
+6. Repositories
 
-### Frecuencia de refresco por módulo
+Each section includes loading and error states plus a last-updated indicator. Refresh intervals are separated by criticality so the UI and backend stay responsive.
 
-- Cluster: cada 30s
-- GitOps: cada 30s
-- CI/CD: cada 120s
-- Metrics: cada 300s
+## Backend
 
-Todas las secciones incluyen estado loading, manejo de error y contador de tiempo desde la última actualización.
+### Endpoints
 
-## Variables de entorno
+- `GET /api/health`
+- `GET /api/cluster/nodes`
+- `GET /api/cluster/pods`
+- `GET /api/cluster/namespaces`
+- `GET /api/cluster/health`
+- `GET /api/gitops/applications`
+- `GET /api/cicd/runs`
+- `GET /api/metrics/red`
+- `GET /api/metrics/slo`
+- `GET /api/metrics/history?hours=24&step=15m`
+
+### Caching policy
+
+- `short`: 30s
+- `medium`: 120s
+- `long`: 300s
+- `extraLong`: 900s
+
+Applied by route:
+
+- `cluster/*`: `short`
+- `gitops/applications`: `short`
+- `cicd/runs`: `medium`
+- `metrics/red` and `metrics/slo`: `long`
+- `metrics/history`: `extraLong`
+
+### Integrations
+
+- Kubernetes: nodes, pods, namespaces, health, and metrics when `metrics.k8s.io` is available.
+- ArgoCD: authenticated requests with a Bearer token and internal CA verification.
+- GitHub Actions: recent runs from the platform repo with status, branch, duration, and trigger.
+- Prometheus: instant queries and time-series queries for RED + SLO.
+
+## Environment variables
 
 ### Backend
 
-Variables usadas por el servidor y servicios:
-
-- PORT (default: 3100)
-- CORS_ORIGIN (default: *)
-- PROMETHEUS_URL (default interno del servicio de Prometheus en cluster)
-- ARGOCD_API_URL
-- ARGOCD_TOKEN
-- ARGOCD_CA_CERT_PATH
-
-Notas:
-
-- ARGOCD_* son necesarias para la sección GitOps.
-- Si PROMETHEUS_URL no es accesible, la sección Observability devolverá errores 502 desde backend.
+- `PORT` - defaults to `3100`.
+- `CORS_ORIGIN` - defaults to `*`.
+- `PROMETHEUS_URL` - Prometheus service URL.
+- `ARGOCD_API_URL` - ArgoCD API URL.
+- `ARGOCD_TOKEN` - access token for ArgoCD.
+- `ARGOCD_CA_CERT_PATH` - CA certificate path.
 
 ### Frontend
 
-- VITE_API_URL (default: http://localhost:3100)
+- `VITE_API_URL` - defaults to `http://localhost:3100`.
 
-## Ejecución local
+## Local development
 
-Requisitos:
+### Requirements
 
-- Node.js 18+ (recomendado 20+).
+- Node.js 18+.
 - npm.
-- Acceso al cluster (kubeconfig válido) para endpoints de Kubernetes.
-- Conectividad a ArgoCD/Prometheus según entorno.
+- Cluster access if you want to query a real Kubernetes environment.
+- Connectivity to ArgoCD and Prometheus depending on the target setup.
 
-Instalar dependencias:
+### Backend
 
-	cd backend
-	npm install
-	cd ../frontend
-	npm install
+```bash
+cd backend
+npm install
+PORT=3100 PROMETHEUS_URL=http://localhost:9090 node src/server.js
+```
 
-Levantar backend:
+### Frontend
 
-	cd backend
-	PORT=3100 PROMETHEUS_URL=http://localhost:9090 node src/server.js
+```bash
+cd frontend
+npm install
+VITE_API_URL=http://localhost:3100 npm run dev -- --host --port 8080
+```
 
-Levantar frontend:
-
-	cd frontend
-	VITE_API_URL=http://localhost:3100 npm run dev -- --host --port 8080
-
-Acceso local esperado:
+### Expected URLs
 
 - Frontend: http://localhost:8080
 - Backend: http://localhost:3100
 
-## Despliegue Kubernetes (base RBAC)
+## Docker Compose
 
-En k8s/base se incluye configuración mínima para permisos de lectura:
+To start the full stack with one command:
 
-- Namespace dashboard.
-- ServiceAccount dashboard-reader.
-- ClusterRole dashboard-read-only.
-- ClusterRoleBinding dashboard-read-only-binding.
+```bash
+docker compose up --build
+```
 
-Aplicar base:
+In this mode the frontend is served on `8080` and the backend on `3100`.
 
-	kubectl apply -f k8s/base
+## Kubernetes
 
-Permisos actuales del rol:
+`k8s/base` contains the minimum RBAC setup needed for read-only platform access:
 
-- Core API: nodes, pods, namespaces, services (get/list/watch)
-- Apps API: deployments, replicasets, statefulsets (get/list/watch)
-- metrics.k8s.io: nodes, pods (get/list)
+- Namespace `dashboard`.
+- ServiceAccount `dashboard-reader`.
+- ClusterRole `dashboard-read-only`.
+- ClusterRoleBinding `dashboard-read-only-binding`.
 
-## Funcionamiento de datos por sección
+Apply the base manifests with:
 
-Cluster Overview:
+```bash
+kubectl apply -f k8s/base
+```
 
-- Resume nodos Ready, pods running, namespaces y uptime estimado.
-- Calcula porcentajes de uso CPU/RAM por nodo a partir de allocatable vs usage.
+Main permissions:
 
-GitOps Status:
+- Core API: nodes, pods, namespaces, and services.
+- Apps API: deployments, replicasets, and statefulsets.
+- `metrics.k8s.io`: nodes and pods.
 
-- Lista applications de ArgoCD.
-- Muestra sync status, health status, revisión y antigüedad del último sync.
+## Why this project stands out
 
-CI/CD Pipeline:
+- It is built like a product, not like a throwaway demo.
+- It tolerates partial failures without breaking the whole interface.
+- It solves a real operations problem: seeing infrastructure, deployment, and observability health in one place.
+- It tells a clear recruiter story: polished frontend, data-aggregating backend, Kubernetes, GitOps, and CI/CD.
 
-- Muestra estado de ejecuciones (success/failure/in progress/cancelled).
-- Incluye rama, trigger, duración y tiempo relativo.
+## Operational note
 
-Observability:
-
-- RED: request rate, error rate, P95 latency.
-- SLO: objetivo 99.5%, valor actual y cumplimiento.
-- Histórico de 24h renderizado con sparklines.
-
-## Qué se está realizando ahora
-
-El foco actual del proyecto está en consolidar una operación unificada de plataforma:
-
-- Integrar health de infraestructura, despliegue y observabilidad en un solo panel.
-
-## CI/CD GitHub Actions
-
-Workflow definido en [ci-cd.yaml](.github/workflows/ci-cd.yaml):
-
-- Job lint: ejecuta ESLint en frontend y backend.
-- Job build-frontend: construye y publica imagen en GHCR.
-- Job build-backend: construye y publica imagen en GHCR.
-- Todos los jobs usan `runs-on: arc-runner-set`.
-
-### Secrets recomendados
-
-Configurar en GitHub: Settings > Secrets and variables > Actions > New repository secret
-
-- Nombre: `GHCR_TOKEN`
-- Valor: PAT con permisos mínimos:
-	- `write:packages`
-	- `read:packages`
-
-Si el repositorio es privado y necesitas leer código con ese token, agrega también `repo`.
-
-Nota: el workflow usa `GHCR_TOKEN` si existe y, como fallback, `GITHUB_TOKEN` con `packages: write`.
-
-### Verificación esperada
-
-Al hacer push a `main`, el workflow debe:
-
-1. Completar lint en verde.
-2. Construir y publicar:
-	 - `ghcr.io/<org>/app-luisops-frontend:latest`
-	 - `ghcr.io/<org>/app-luisops-backend:latest`
-3. Publicar también tags por commit SHA.
-- Operar un entorno multi-componente con GitOps y CI/CD reales.
-- Usar métricas operativas para validar estabilidad del entorno kubeadm.
-
-Siguientes líneas naturales de evolución:
-
-- Añadir autenticación/autorización para proteger el dashboard.
-- Incorporar tracing distribuido (OpenTelemetry/Tempo).
-- Versionar manifiestos completos de despliegue del dashboard.
-- Añadir tests de contrato para endpoints de integración externa.
-
-## Troubleshooting
-
-Si falla GitOps:
-
-- Verifica ARGOCD_API_URL, ARGOCD_TOKEN y ARGOCD_CA_CERT_PATH.
-- Revisa conectividad TLS entre backend y ArgoCD.
-
-Si falla observabilidad:
-
-- Verifica PROMETHEUS_URL desde el backend.
-- Comprueba que existen métricas wellness_http_requests_total y wellness_http_request_duration_seconds_bucket.
-
-Si cluster devuelve datos vacíos:
-
-- Comprueba contexto kubeconfig activo en local.
-- Valida que metrics-server está operativo para métricas de uso.
-
-## Nota
-
-Este repositorio documenta y refleja un entorno real en construcción continua. La intención es mantener una vista operativa clara de un cluster kubeadm gestionado con prácticas modernas de GitOps, CI/CD y observabilidad.
+The observability section falls back gracefully when Prometheus is not available locally. That avoids a bad user experience and keeps the dashboard usable even when an upstream dependency is degraded.
