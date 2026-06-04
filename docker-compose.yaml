@@ -18,7 +18,9 @@ services:
       - /home/ubuntu/.kube/config:/root/.kube/config:ro
       - ./backend/wellness-ca.crt:/app/wellness-ca.crt:ro
     networks:
-      - dashboard
+      dashboard:
+        aliases:
+          - luisops-backend
 
   frontend:
     build:
