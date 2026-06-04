@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   ORG: luisrodvilladaorg
@@ -126,7 +130,29 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add k8s/overlays/prod/kustomization.yaml
-          git commit -m "chore: update image tags to ${{ github.sha }}"
-          git pull --rebase origin main
-          git push
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt: sync with origin/main and apply manifest update"
+            git fetch origin main
+            git checkout main
+            git reset --hard origin/main
+
+            sed -i "s|newTag:.*|newTag: ${{ github.sha }}|g" k8s/overlays/prod/kustomization.yaml
+
+            if git diff --quiet -- k8s/overlays/prod/kustomization.yaml; then
+              echo "Manifest already points to ${{ github.sha }}; nothing to commit"
+              exit 0
+            fi
+
+            git add k8s/overlays/prod/kustomization.yaml
+            git commit -m "chore: update image tags to ${{ github.sha }}"
+
+            if git push origin HEAD:main; then
+              echo "Manifest update pushed successfully"
+              exit 0
+            fi
+
+            echo "Push failed due to remote changes, retrying..."
+          done
+
+          echo "Failed to push manifest update after retries"
+          exit 1
