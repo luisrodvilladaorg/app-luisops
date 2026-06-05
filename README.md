@@ -11,30 +11,6 @@ The goal is not to display pretty cards. The goal is to give both an executive a
 - Surfaces reliability signals with near real-time RED and SLO metrics.
 - Works well as a portfolio piece for recruiters: infrastructure, backend, frontend, GitOps, and operational thinking in one project.
 
-## Real screenshots
-
-The images below were captured from the application while it was running with live platform data.
-
-### Overview
-
-![Dashboard hero](docs/assets/hero-desktop.png)
-
-### GitOps
-
-![GitOps state](docs/assets/gitops-desktop.png)
-
-### Observability
-
-![Observability section](docs/assets/observability-desktop.png)
-
-### Repositories
-
-![Repository block](docs/assets/repos-desktop.png)
-
-### Author
-
-![Author section](docs/assets/author-desktop.png)
-
 ## Current system state
 
 The project is designed around a real Kubernetes environment, not mock data. In the current live capture you can see:
@@ -46,6 +22,52 @@ The project is designed around a real Kubernetes environment, not mock data. In 
 - Observability showing live values and series, plus fallback handling when Prometheus is not reachable locally.
 
 The backend also includes request timeouts, per-endpoint caching, and partial responses when an upstream dependency fails, so the UI does not collapse into empty screens or total errors.
+
+## Kubernetes cluster captures
+
+The following captures were generated from live `kubectl` commands against the current cluster context.
+
+### 1. cluster-info
+
+![kubectl cluster-info](docs/assets/cluster-captures/01-cluster-info.png)
+
+This capture confirms the API server endpoint and core control-plane services are reachable from the current context.
+
+### 2. get nodes -o wide
+
+![kubectl get nodes -o wide](docs/assets/cluster-captures/02-get-nodes-wide.png)
+
+This view shows node readiness, Kubernetes version, internal IPs, and host-level details to validate cluster capacity and topology.
+
+### 3. top nodes
+
+![kubectl top nodes](docs/assets/cluster-captures/03-top-nodes.png)
+
+This output provides real-time CPU and memory usage by node to quickly identify pressure, hotspots, or imbalances.
+
+### 4. get namespaces
+
+![kubectl get namespaces](docs/assets/cluster-captures/04-get-namespaces.png)
+
+This list gives a global inventory of active namespaces and their status to verify environment segmentation.
+
+### 5. get pods -A
+
+![kubectl get pods -A](docs/assets/cluster-captures/05-get-pods-all.png)
+
+This snapshot shows pod health across all namespaces, useful to detect restarts, pending workloads, or failing system components.
+
+### 6. get deployments -A
+
+![kubectl get deployments -A](docs/assets/cluster-captures/06-get-deployments-all.png)
+
+This capture validates desired vs available replicas for deployments and highlights rollout or availability problems.
+
+### 7. get svc -A
+
+![kubectl get svc -A](docs/assets/cluster-captures/07-get-services-all.png)
+
+This output summarizes service exposure (ClusterIP, LoadBalancer, ports, external IPs) to validate in-cluster and ingress connectivity.
 
 ## Architecture
 
